@@ -1,9 +1,11 @@
 (function (win, doc){
   var View = new Class({
-    initialize: function () {
-      
+    Implements: [Options, Events],
+    options: {},
+    initialize: function (options) {
+      this.setOptions(options);
     }
-  })
+  });
 
-  win.View = View
+  win.View = View;
 }(window, document));

@@ -1,9 +1,11 @@
 (function (win, doc){
   var Model = new Class({
-    initialize: function () {
-      
+    Implements: [Options, Events],
+    options: {},
+    initialize: function (options) {
+      this.setOptions(options);
     }
-  })
+  });
 
-  win.Model = Model
+  win.Model = Model;
 }(window, document));
