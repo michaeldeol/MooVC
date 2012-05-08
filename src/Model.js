@@ -3,6 +3,8 @@
   // private real setter functions, not on prototype, see note on .set
   var _set = function(key, value) {
       var self = this
+        , method = this['get'+arguments[0].capitalize()]
+
       // needs to be bound the the instance.
       if (!key || typeof value === undefined) return self
 
@@ -12,22 +14,23 @@
       if (value === null) {
           self.__data.delete(key) // delete = null.
       } else {
+          if (method) {
+            method.apply(this, slice.call(arguments, 1))
+          }
           self.__data[key] = value
       }
       // fire an event for data-binders.
-      self.fireEvent("data.changed",[key, value])
+      self.observer && self.observer.fireEvent("data.changed",[key, value])
       return self
   }.overloadSetter()
 
   var Model = new Class({
-    Implements: [Options, Events],
+    Implements: Events,
     ,__data: {}
-    ,options: {
-
-    }
     ,initialize: function (data, options) {
+      // See if this creates a stack overflow...
+      self.observer = options.observer || self
       data && this.set(data)
-      this.setOptions(options);
     }
 
     /**
@@ -39,14 +42,22 @@
     ,get: function (args){
       args = Array.isArray(args)? args: slice.call(arguments, 0)
       var self = this
-      return (args.length == 1)? self.__data[args[0]]
-        :(function() {
-          var got = {}
-          args.forEach(function(key){
-            got[key] = self.__data[key]
-          })
-          return got
-        )())
+        , method = self['get'+String(arguments[0]).capitalize()]
+      
+      // If we: 
+      //  - only got one argument
+      //  - it's a string
+      //  - and it's capitalized value appended to 'get' is a method
+      if ( args.length === 1 && typeof args[0] === 'string' ) {
+        return method? method.apply(self, args) : self.__data[args[0]]
+      }
+
+      return (function(got) {
+        args.forEach(function(key){
+          got[key] = self.get(key)
+        })
+        return got
+      )({}))
     }
 
     /**
@@ -56,11 +67,17 @@
      *  otherwise, if more than one key is provided, it will return a hashmap. 
      */
     ,set: function () {
-      var method = this['get'+arguments[0].capitalize()]
-      if (typeof arguments[0] === 'string' && method) {
-        return method.apply(this, arguments)
-      } 
       return _set.apply(this, arguments)
+    }
+
+    /** 
+     *  Model#getData
+     *  returns the full data set
+     */
+    ,getData: function () {
+      // return a copy.  Don't let the bastards
+      // taint our data pool!
+      return Object.extend({},this.__data)
     }
   })
   win.Model = Model;
