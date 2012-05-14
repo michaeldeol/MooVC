@@ -1,85 +1,90 @@
-(function (win, doc){
-  var slice = Array.prototype.slice
+(function( win, doc ) {
+
   // private real setter functions, not on prototype, see note on .set
-  var _set = function(key, value) {
-      var self = this
-        , method = this['get'+arguments[0].capitalize()]
+  var _set = function( key, value ) {
 
-      // needs to be bound the the instance.
-      if (!key || typeof value === undefined) return self
+    // needs to be bound the the instance.
+    if ( !key || typeof value === undefined ) return this;
 
-      // no change? don't waste our time.
-      if (self.__data[key] && self.__data[key] === value) return self
+    if ( this.__data[key] === undefined ) throw new Error( 'Model does not contain the key: ' + key );
 
-      if (value === null) {
-          self.__data.delete(key) // delete = null.
-      } else {
-          if (method) {
-            method.apply(this, slice.call(arguments, 1))
-          }
-          self.__data[key] = value
-      }
-      // fire an event for data-binders.
-      self.observer && self.observer.fireEvent("data.changed",[key, value])
-      return self
-  }.overloadSetter()
+    // no change? don't waste our time.
+    if ( this.__data[key] && this.__data[key] === value ) return this;
 
-  var Model = new Class({
-    Implements: Events,
-    ,__data: {}
-    ,initialize: function (data, options) {
-      // See if this creates a stack overflow...
-      self.observer = options.observer || self
-      data && this.set(data)
+    if ( value === null ) {
+      this.__data.delete( key ); // delete = null.
+    } else {
+      this.__data[ key ] = value;
     }
+    // fire an event for (change:key) passing back the value
+    return this.fireEvent( 'change:' + key, value );
+  }.overloadSetter();
+
+
+  /**
+   * Model: Class
+   * This is our base model for all future created models
+   */
+  var Model = new Class({
+
+    __cid: false,
+
+    __data: {},
+
+    Implements: [Options, Events],
+
+    initialize: function( data, options ) {
+      this.setOptions( options );
+      this.__cid = this.getUID();
+      data && typeOf( data ) === 'object' && this.set( data );
+      this.init();
+    },
 
     /**
-     *  Model#get
-     *  model.get('key'), model.get('key', 'other'), model.get(['key','otherkey'])
-     *  if one key is provided, it will return just that value.  
-     *  otherwise, if more than one key is provided, it will return a hashmap. 
+     * Override me if needed
      */
-    ,get: function (args){
-      args = Array.isArray(args)? args: slice.call(arguments, 0)
-      var self = this
-        , method = self['get'+String(arguments[0]).capitalize()]
-      
-      // If we: 
-      //  - only got one argument
-      //  - it's a string
-      //  - and it's capitalized value appended to 'get' is a method
-      if ( args.length === 1 && typeof args[0] === 'string' ) {
-        return method? method.apply(self, args) : self.__data[args[0]]
-      }
-
-      return (function(got) {
-        args.forEach(function(key){
-          got[key] = self.get(key)
-        })
-        return got
-      )({}))
-    }
+    init: function() {},
 
     /**
      *  Model#set
      *  model.set('key', value), model.set({key: value})
-     *  if one key is provided, it will return just that value.  
-     *  otherwise, if more than one key is provided, it will return a hashmap. 
+     *  if one key is provided, it will return just that value.
+     *  otherwise, if more than one key is provided, it will return a hashmap.
      */
-    ,set: function () {
-      return _set.apply(this, arguments)
-    }
+    set: function() {
+      _set.apply( this, arguments );
+      this.fireEvent( 'change' ); // TODO: Verify whether this is needed
+    },
 
-    /** 
+    /**
+     *  Model#get
+     *  model.get('key'), model.get('key', 'other'), model.get(['key','otherkey'])
+     *  if one key is provided, it will return just that value.
+     *  otherwise, if more than one key is provided, it will return a hashmap.
+     */
+    get: function( key ) {
+      return ( key && typeof this.__data[key] !== undefined ) ? this.__data[key] : null;
+    }.overloadGetter(),
+
+    /**
      *  Model#getData
      *  returns the full data set
      */
-    ,getData: function () {
+    getData: function() {
       // return a copy.  Don't let the bastards
       // taint our data pool!
-      return Object.extend({},this.__data)
+      return Object.extend( {}, this.__data ); // returns a function
+      //return this.__data; // returns F > object data
+    },
+
+    getUID: function() {
+        // https://gist.github.com/1308368
+        for ( b = a = ''; a++ < 36; b += a * 51 & 52 ? (a ^ 15 ? 8 ^ Math.random() * (a ^ 20 ? 16 : 4) : 4).toString(16) : '-' );
+        return b
     }
-  })
+
+  });
+
   win.Model = Model;
 
-}(window, document));
+}( window, document ));
