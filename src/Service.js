@@ -1,5 +1,11 @@
 (function( win, doc ) {
 
+  /**
+   * Private Models
+   * We only want the class to get/set these items
+   */
+  var __models = [];
+
   var Service = new Class({
 
     Implements: [Options, Events],
@@ -12,31 +18,22 @@
     model: Model,
 
     /**
-     * __models: [Array]
-     * Store the models we find.
-     */
-    __models: [],
-
-    initialize: function( models, options ) {
-      // Testing
-      console.log( this.__models );
-    },
-
-    /**
      * add: method
      * Add a model to our storage
      */
     add: function( model ) {
       // TODO: Check for dupes
-      this.__models.push( model );
+      __models.push( model );
     },
 
     /**
      * get: method
-     * Returns the model we are looking for.
+     * Returns all modules
+     * TODO: This may need to be renamed 'get' feels to specific
      */
-    get: function( id ) {
-      return this.__models[id];
+    get: function() {
+      if ( __models.length === 0 ) return 'Unable to locate any Modules...';
+      return __models;
     }
 
   });

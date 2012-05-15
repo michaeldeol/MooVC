@@ -11,8 +11,29 @@
     /**
      * Save a copy of the model we are using
      * TODO: This is currently not being used... need to use this rather than __models if possible.
+     * UPDATE: This will be used in the Service Model to create new TODO's
      */
     model: Todo,
+
+    /**
+     * create:
+     * Create a new Todo to be used
+     */
+    create: function( title ) {
+      var todo = new this.model();
+      // Only set the title if available, else we will use the default model title
+      // TODO: Look into removing this and requiring a title
+      if ( title ) todo.set( 'title', title );
+      this.add( todo );
+    },
+
+    /**
+     * destroy:
+     * Delete the model from our records
+     */
+    destroy: function( model ) {
+      this.get().erase( model );
+    },
 
     /**
      * getCompleted:
@@ -20,8 +41,8 @@
      */
     getCompleted: function() {
       var completed = [];
-      this.__models.each(function( item, index ) {
-        if ( item.__data.completed ) completed.push( item );
+      this.get().each( function( model, index ) {
+        if ( model.__data.completed ) completed.push( model );
       });
       return completed;
     },
@@ -32,8 +53,8 @@
      */
     getByTitle: function( title ) {
       var found = [];
-      this.__models.each(function( item, index ) {
-        if ( item.__data.title === title ) found.push( item );
+      this.get().each( function( model, index ) {
+        if ( model.__data.title === title ) found.push( model );
       });
       if ( found.length === 0 ) return 'Unable to find title: ' + title;
       return found;

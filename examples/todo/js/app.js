@@ -1,7 +1,7 @@
 (function( win, doc ) {
 
-  var todo1 = new Todo;
-  var todos = new todoService;
+  var todo1 = new Todo();
+  var todos = new todoService();
 
   todo2 = new Todo;
   todo3 = new Todo;
@@ -19,7 +19,7 @@
   console.log( todo1.get('completed') );
   console.log( todo1 );
 
-  console.log('--------- Service Test ---------');
+  console.log('--------- Service Test: Find Todos ---------');
   todos.add( todo1 );
   todos.add( todo2 );
   todos.add( todo3 );
@@ -27,6 +27,15 @@
   var foundByTitle = todos.getByTitle( 'wowmom' );
   console.log( completed );
   console.log( foundByTitle );
+
+  console.log('--------- Service Test: Create Todo ---------');
+  todos.create( 'Created by the Service Model' );
+  todos.create();
+  console.log('--------- Service Test: Return All Models ---------');
+  console.log( todos.get() );
+  console.log('--------- Service Test: Erase a Model ---------');
+  todos.destroy( todo2 );
+  console.log( todos.get() );
 
   // TODO: Include an App View and a Todo View.
   // NOTE: Look into developing the Controller to handle the passing between
