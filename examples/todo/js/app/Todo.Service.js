@@ -16,6 +16,12 @@
     model: Todo,
 
     /**
+     * storage:
+     * Lets hide this data in localStorage
+     */
+    // storage: new Model.Local( 'todos-mootools' ),
+
+    /**
      * create:
      * Create a new Todo to be used
      */
@@ -42,7 +48,7 @@
     getCompleted: function() {
       var completed = [];
       this.get().each( function( model, index ) {
-        if ( model.__data.completed ) completed.push( model );
+        if ( model.get( 'completed' ) ) completed.push( model );
       });
       return completed;
     },
@@ -54,10 +60,14 @@
     getByTitle: function( title ) {
       var found = [];
       this.get().each( function( model, index ) {
-        if ( model.__data.title === title ) found.push( model );
+        if ( model.get( 'title' ) === title ) found.push( model );
       });
       if ( found.length === 0 ) return 'Unable to find title: ' + title;
       return found;
+    },
+
+    cleanTodo: function( model ) {
+      console.log( model );
     }
 
   });

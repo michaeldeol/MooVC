@@ -2,26 +2,35 @@
 
   Model.Local = new Class({
 
-    Extends: Model,
-
     timeouts: [],
 
     localKey: '',
 
-    initialize: function ( data ) {
-      // this.localKey = String( localKey );
+    /**
+     * init:
+     * Override Model.init to instiate the data
+     */
+    initialize: function ( localKey ) {
+      this.localKey = localKey;
       var localData = localStorage.getItem( this.localKey ) || {};
-      this.parent( Object.extend( data, localData ) );
     },
 
+    /**
+     * set:
+     * Currently this overrides the set method from the extended Model
+     * TODO: Do we need to override this or can we find a way to implement to work together.
+     */
     set: function () {
-      this.parent( arguments );
       clearTimeout( this.timeouts[ this.localKey ] );
       this.timeouts[ this.localKey ] = setTimeout( this.save.bind( this ), 100 );
     },
 
-    save: function () {
-      localStorage.setItem( this.localKey, JSON.stringify( this.get('data') ) );
+    /**
+     * save:
+     * Save our items to localStorage
+     */
+    save: function ( data ) {
+      localStorage.setItem( this.localKey, JSON.stringify( data ) );
     }
 
   });

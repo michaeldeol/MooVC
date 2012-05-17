@@ -9,9 +9,6 @@
      */
     Extends: Model,
 
-    // TODO: implement some form of storage (localStorage) as an example
-    // localKey: 'todos-mootools',
-
     /**
      * __data:
      * Initial data structore for specific model

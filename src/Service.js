@@ -19,11 +19,17 @@
 
     /**
      * add: method
-     * Add a model to our storage
+     * Add a model(s) to our storage
      */
-    add: function( model ) {
-      // TODO: Check for dupes
-      __models.push( model );
+    add: function( models ) {
+      if ( typeOf( models ) === 'array' ) {
+        for ( var i = 0; i < models.length; i++ ) {
+          __models.push( models[i] );
+        }
+      } else {
+        __models.push( models );
+      }
+
     },
 
     /**

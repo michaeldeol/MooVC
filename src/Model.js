@@ -35,7 +35,7 @@
 
     initialize: function( data, options ) {
       this.setOptions( options );
-      this.__cid = this.getUID();
+      this.__cid = String.uniqueID();
       data && typeOf( data ) === 'object' && this.set( data );
       this.init();
     },
@@ -75,12 +75,6 @@
       // taint our data pool!
       return Object.extend( {}, this.__data ); // returns a function
       //return this.__data; // returns F > object data
-    },
-
-    getUID: function() {
-        // https://gist.github.com/1308368
-        for ( b = a = ''; a++ < 36; b += a * 51 & 52 ? (a ^ 15 ? 8 ^ Math.random() * (a ^ 20 ? 16 : 4) : 4).toString(16) : '-' );
-        return b
     }
 
   });
