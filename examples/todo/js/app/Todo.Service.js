@@ -1,7 +1,7 @@
 (function( win, doc ) {
 
   // Todo Service Model
-  var todoService = new Class({
+  Todo.Service = new Class({
 
     /**
      * Extend our Service object
@@ -31,6 +31,7 @@
       // TODO: Look into removing this and requiring a title
       if ( title ) todo.set( 'title', title );
       this.add( todo );
+      this.fireEvent( 'add', todo );
     },
 
     /**
@@ -72,6 +73,6 @@
 
   });
 
-  win.todoService = todoService;
+  win.Todo.Service = Todo.Service;
 
 }( window, document ));
