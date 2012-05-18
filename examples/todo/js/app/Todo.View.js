@@ -13,44 +13,43 @@
      * This may not be needed at the moment,
      * we can look into removing or implementing in the extending class
      */
-    initialize: function( options ) {
-      this.setOptions( options );
+    initialize: function( model ) {
+      // this.setOptions( options );
+      this.model = model;
     },
 
     template: function() {
 
-      console.log(this);
-
       var checkbox = this.build( 'input', {
         'class': 'toggle',
         'type': 'checkbox',
-        'data-todo-id': this.options.model.__cid
+        'data-todo-id': this.model.__cid
       });
 
       var label = this.build( 'label', {
-        'data-todo-id': this.options.model.__cid,
-        'text': this.options.model.get( 'title' )
+        'data-todo-id': this.model.__cid,
+        'text': this.model.get( 'title' )
       });
 
       var del = this.build( 'button', {
         'class': 'destroy',
-        'data-todo-id': this.options.model.__cid
+        'data-todo-id': this.model.__cid
       });
 
       var div = this.build( 'div', {
         'class': 'view',
-        'data-todo-id': this.options.model.__cid
+        'data-todo-id': this.model.__cid
       });
 
       var edit = this.build( 'input', {
         'id': 'fooID',
-        'data-todo-id': this.options.model.__cid,
+        'data-todo-id': this.model.__cid,
         'class': 'edit',
-        'value': this.options.model.get( 'title' )
+        'value': this.model.get( 'title' )
       });
 
       var li = this.build( this.type, {
-        'id': this.options.model.__cid,
+        'id': this.model.__cid,
         'class': 'incomplete'
       });
 
@@ -95,7 +94,7 @@
     },
 
     addTodo: function( todo ) {
-      var view = new Todo.View( {model: todo} );
+      var view = new Todo.View( todo );
       $('todo-list').adopt( view.render() );
     },
 
